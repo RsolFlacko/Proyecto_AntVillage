@@ -6,4 +6,5 @@ Requisitos para poder correr el proyecto: Tener Java en tu computadora y descarg
 Lenguaje de programación: Java Programming Language: Java IDE: NetBeans 
 Documentación interna por medio de JavaDoc
 Calendario, features, historias de usuario y tareas mejores vistas y hechas en Jira Software
+Este proyecto esta implementado con sockets para poder visualizar la simulación.
 Autor: Roger Solano Suárez
