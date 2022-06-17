@@ -19,8 +19,8 @@ import static javax.swing.SwingConstants.CENTER;
 import static javax.swing.SwingConstants.TOP;
 
 /**
- *
- * @author pc
+ * Esto representa la interfaz del programa 
+ * @author Roger Solano
  */
 public class Interfaz extends javax.swing.JFrame {
 
@@ -161,6 +161,7 @@ public class Interfaz extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // Detecta cuando se clickea el botón start
     private void B_startMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_B_startMouseClicked
         // TODO add your handling code here:
         if (botonEnabled) {
@@ -170,7 +171,6 @@ public class Interfaz extends javax.swing.JFrame {
                     int[] coordenadasposiciones;
                     coordenadasposiciones = coordenadas.ObtenerCoordenadas(recorrido);  
 
-                    // se cumple si el jugador a superado o ha llegado al final del tablero
                     if (recorrido >= 15) {
                         recorrido = 16;
                         //finalizarJuego();
@@ -198,7 +198,6 @@ public class Interfaz extends javax.swing.JFrame {
                             H_verde.setLocation(coordenadasposiciones[0], coordenadasposiciones[1]);
                         }
 
-                        //se cumple si la ficha del jugador se encuentra en una casilla de túnel
                     } else {
 
                         //recorrido += numTunel; //posiciones ha avanzar (extra)
@@ -295,7 +294,7 @@ public class Interfaz extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         }
-        // Arreglo de tipo JLabel que contiene cada una de las casilla del tablero
+        
         JLabel[] posiciones = new JLabel[]{H_azul, H_verde, Food, Food_2, Food_3, N_azul, N_verde};
         int PassNombre=0;
         
@@ -306,7 +305,7 @@ public class Interfaz extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
 
-                // se muestran los nombres de los jugadores en la pantalla de juego
+               
             }if (PassNombre==0){
                 PassNombre=1;
                 Interfaz2=mensaje;
@@ -359,8 +358,6 @@ public class Interfaz extends javax.swing.JFrame {
                     PanelJuego.setVisible(true);
                     mensaje = "";
 
-                    /condición que se cumple si ambos jugadores obtienen el mismo número del dado al asignar quien comienza
-                    a jugar de primero./
                 } else if (mensaje.equals("otra vez")) {
                     buttonDado.setEnabled(true);
                     botonEnabled = true;
@@ -377,11 +374,11 @@ public class Interfaz extends javax.swing.JFrame {
                     //se obtiene dos mensajes enviados por el jugador 2 y se guardan en un arreglo
                     String[] msjAvance = mensaje.split("\n");
                     if (mensaje.equals("")) {
-                        fichaJugador2.setLocation(fichaJugador2.getX() + 20, fichaJugador2.getY());
+                        H_azul.setLocation(H_azul.getX() + 20, H_azul.getY());
 
                         //se cumple cuando el jugador 2 ha contestado bien a su pregunta de reto
                     } else if (mensaje.equals("correcto")) {
-                        fichaJugador2.setLocation(fichaJugador2.getX(), fichaJugador2.getY());
+                        H_azul.setLocation(H_azul.getX(), H_azul.getY());
                         buttonDado.setEnabled(true);
                         LabelPregunta.setText("Respuesta correcta");
                         botonEnabled = true;
@@ -397,14 +394,14 @@ public class Interfaz extends javax.swing.JFrame {
                         int AvanceFicha2 = Integer.parseInt(msjAvance[1]);
 
                         if (AvanceFicha2 <= 0) {
-                            fichaJugador2.setLocation(CInicio.getX() + 20, CInicio.getY());
+                            H_azul.setLocation(CInicio.getX() + 20, CInicio.getY());
                             buttonDado.setEnabled(true);
                             botonEnabled = true;
                             
                         } else if (msjAvance[0].equals("esperando")) {
                             int[] coordenadasCasilla;
                             coordenadasCasilla = coordenadas.ObtenerCoordenadas(AvanceFicha2);
-                            fichaJugador2.setLocation(coordenadasCasilla[0] + 20, coordenadasCasilla[1]);
+                            H_azul.setLocation(coordenadasCasilla[0] + 20, coordenadasCasilla[1]);
 
                             //se cumple cuando el jugador 2 ha ganado
                         } else if (msjAvance[0].equals("fin del juego")) {
@@ -443,7 +440,7 @@ datoSalida.close();
                             LabelPregunta.setText("Respuesta incorrecta");
                             int[] coordenadasCasilla;
                             coordenadasCasilla = coordenadas.ObtenerCoordenadas(AvanceFicha2);
-                            fichaJugador2.setLocation(coordenadasCasilla[0] + 20, coordenadasCasilla[1]);
+                            H_azul.setLocation(coordenadasCasilla[0] + 20, coordenadasCasilla[1]);
                             buttonDado.setEnabled(true);
                             botonEnabled = true;
 }
