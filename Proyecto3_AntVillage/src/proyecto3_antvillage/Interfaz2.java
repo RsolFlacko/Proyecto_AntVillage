@@ -1,11 +1,36 @@
 
 package proyecto3_antvillage;
 
+import java.awt.Color;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import static javax.swing.SwingConstants.CENTER;
+import static javax.swing.SwingConstants.TOP;
+
 /**
  *
  * @author pc
  */
 public class Interfaz2 extends javax.swing.JFrame {
+    
+    static boolean botonEnabled = false; // estado del botón del dado.
+    static List_posiciones coordenadas = new List_posiciones();
+    int recorrido = 0; // progreso de la ficha del jugador en el tablero
+    Imagenes imagenes = new Imagenes();
+    static String mensaje = "";
+
+    static Socket socket;
+    static DataInputStream datoEntrada;
+    static DataOutputStream datoSalida;
 
     /**
      * Creates new form Interfaz2
@@ -134,9 +159,82 @@ public class Interfaz2 extends javax.swing.JFrame {
 
     private void B_startMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_B_startMouseClicked
         // TODO add your handling code here:
+        if {
+            // Arreglo de tipo JLabel que contiene cada una de las casilla del tablero
+            JLabel[] posiciones = new JLabel[]{H_azul, H_verde, Food, Food_2, Food_3, N_azul, N_verde};
+            Asignar_posiciones listaposicionesRandom = new Asignar_posiciones();
+            int[] posicionesRandom;
+            posicionesRandom = listaposicionesRandom.dequeue();
+            try {
+                datoSalida.writeUTF("posicion");
+            } catch (IOException ex) {
+                Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+            }
         
+        for (int i = 0; i <= posiciones.length; i++) {
+                if (i != posiciones.length) {
+                    JLabel posicion = posiciones[i];
+                    String index = String.valueOf(posicionesRandom[i]);
+                    try {
+                        datoSalida.writeUTF(index);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    switch (posicionesRandom[i]) {
+                        case 1:
+                            coordenadas.insertLast(posicion.getX(), posicion.getY(), posicionesRandom[i]);
+                            posicion.setIcon(imagenes.Food);
+                            break;
+                        case 2:
+                            coordenadas.insertLast(posicion.getX(), posicion.getY(), posicionesRandom[i]);
+                            posicion.setIcon(imagenes.N_verde);
+                            break;
+                        case 3:
+                            coordenadas.insertLast(posicion.getX(), posicion.getY(), posicionesRandom[i]);
+                            posicion.setIcon(imagenes.N_azul);
+                            break;
+                    }
+                 
+                } else {
+                        coordenadas.insertFinal(N_azul.getX(), N_azul.getY());
+                    }
+                }
+                try {
+                    datoSalida.writeUTF("iniciar");
+                } catch (IOException ex) {
+                    Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                H_verde.setLocation(N_verde.getX() + 20, N_verde.getY());
+                H_azul.setLocation(N_azul.getX(), N_azul.getY());
+            }
     }//GEN-LAST:event_B_startMouseClicked
 
+    public void finalizarJuego() {
+        String msjRecorrido = String.valueOf(recorrido);
+        try {
+            datoSalida.writeUTF("fin del juego\n" + msjRecorrido);
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            datoSalida.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            datoEntrada.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return;
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -170,6 +268,110 @@ public class Interfaz2 extends javax.swing.JFrame {
                 new Interfaz2().setVisible(true);
             }
         });
+        
+        try {
+            socket = new Socket("127.0.0.1", 1201);
+            datoEntrada = new DataInputStream(socket.getInputStream());
+            datoSalida = new DataOutputStream(socket.getOutputStream());
+            int PassNombre = 0; //variable para tomar el nombre del jugador 1 solo una vez
+
+            //bucle donde que se encuentra escuchando los mensajes del jugador 1
+            while (true) {
+                try {
+                    mensaje = datoEntrada.readUTF();
+                } catch (java.net.SocketException ex) {
+                } catch (IOException ex) {
+                    Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                 // se recibe el nombre del jugador 1
+                if (PassNombre == 0) {
+                    PassNombre = 1;
+                    Interfaz = mensaje;
+
+                }
+                
+                //se cumple cuando ambos jugadores obtenga el mismo número de dado
+                else if (valorDado == 0 && !mensaje.equals("") && count == 0) {
+                    buttonDado2.setEnabled(true);
+                    botonEnabled = true;
+
+                } else {
+                     //se obtiene dos mensajes enviados por el jugador 1 y se guardan en un arreglo
+                    String[] msjAvance = mensaje.split("\n");
+                    if (mensaje.equals("")) {
+                        H_verde.setLocation(H_verde.getX() + 20, H_verde.getY());
+
+                        //se cumple cuando el jugador 1 ha contestado bien a su pregunta de reto
+                    } else if (mensaje.equals("correcto")) {
+                        H_verde.setLocation(H_verde.getX(), H_verde.getY());
+                        buttonDado2.setEnabled(true);
+                        LabelPregunta.setText("Respuesta correcta");
+                        botonEnabled = true;
+
+                        //se muestra la pregunta que se le asignó al jugador 1
+                    } else if (msjAvance[1].equals("pregunta")) {
+                        LabelPregunta.setVisible(true);
+                        LabelPregunta.setVerticalAlignment(CENTER);
+                        LabelPregunta.setText("<html>¡Reto para Oponente!<p><p>" + msjAvance[0] + "<p></html>");
+} else {
+
+                        int AvanceFicha1 = Integer.parseInt(msjAvance[1]);
+
+                        if (AvanceFicha1 <= 0) {
+                            H_verde.setLocation(N_verde.getX() + 20, N_verde.getY());
+                            buttonDado2.setEnabled(true);
+                            botonEnabled = true;
+
+                            // se actualiza el progreso del jugador 1 antes del reto que se le asignó
+                        } else if (msjAvance[0].equals("esperando")) {
+                            int[] coordenadasposiciones;
+                            coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha1);
+                            H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+//se cumple cuando el jugador 1 ha ganado
+                        } else if (msjAvance[0].equals("fin del juego")) {
+                            int[] coordenadasposiciones;
+                            coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha1);
+                            H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                            LabelPregunta.setVisible(true);
+                            LabelPregunta.setVerticalAlignment(TOP);
+                            LabelPregunta.setText("<html>¡Fin del Juego!<p><p>!Has perdido!<p></html>");
+                            buttonDado2.setEnabled(false);
+                            botonEnabled = false;
+                            salirFin.setVisible(true);
+                            salirFin.setLocation(botonRespuesta.getX(), botonRespuesta.getY());
+                            try {
+                                socket.close();
+                            } catch (IOException ex) {
+                            }
+                            try {
+                                datoSalida.close();
+                            } catch (IOException ex) {
+                            }
+                            try {
+                                datoEntrada.close();
+                            } catch (IOException ex) {
+                            }
+
+                            return;
+                            
+                            /* se actualiza el progreso del jugador 1 o si el otro jugador responde de forma incorrecta 
+                            la pregunta de reto*/
+                        } else {
+                            LabelPregunta.setText("Respuesta incorrecta");
+                            int[] coordenadasposiciones;
+                            coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha1);
+                            H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                            buttonDado2.setEnabled(true);
+                            botonEnabled = true;
+                        }
+
+                    }
+
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

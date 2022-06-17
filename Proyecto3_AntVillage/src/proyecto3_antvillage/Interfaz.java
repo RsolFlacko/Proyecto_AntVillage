@@ -28,7 +28,7 @@ public class Interfaz extends javax.swing.JFrame {
     static boolean botonEnabled = true; // estado del botón del dado.
     static List_posiciones coordenadas = new List_posiciones();
     static int recorrido = 0; // progreso de la ficha del jugador en el tablero
-    //static Imagenes imagenes = new Imagenes();
+    static Imagenes imagenes = new Imagenes();
     static String mensaje = "";
 
     static ServerSocket serverSocket;
@@ -171,8 +171,8 @@ public class Interfaz extends javax.swing.JFrame {
                     int[] coordenadasposiciones;
                     coordenadasposiciones = coordenadas.ObtenerCoordenadas(recorrido);  
 
-                    if (recorrido >= 15) {
-                        recorrido = 16;
+                    if (recorrido >= 4) {
+                        recorrido = 5;
                         //finalizarJuego();
                         coordenadasposiciones = coordenadas.ObtenerCoordenadas(recorrido);
                         H_verde.setLocation(coordenadasposiciones[0], coordenadasposiciones[1]);
@@ -187,23 +187,8 @@ public class Interfaz extends javax.swing.JFrame {
                         return;
 
                         //se cumple si la ficha del jugador se encuentra en una casilla de trampa
-                    } else if (coordenadasposiciones[2] == 2) {
-
-                        //recorrido -= numTunel; //posiciones a retroceder (extra)
-                        if (recorrido <= 0) {
-                            recorrido = 0;
-                            H_verde.setLocation(N_verde.getX(), N_verde.getY());
-                        } else {
-                            coordenadasposiciones = coordenadas.ObtenerCoordenadas(recorrido);
-                            H_verde.setLocation(coordenadasposiciones[0], coordenadasposiciones[1]);
-                        }
-
-                    } else {
-
-                        //recorrido += numTunel; //posiciones ha avanzar (extra)
-                        coordenadasposiciones = coordenadas.ObtenerCoordenadas(recorrido);
-                        H_verde.setLocation(coordenadasposiciones[0], coordenadasposiciones[1]);
-                    }
+                    } 
+                    
                     // se envía una actualización del progreso del jugador 1 al jugador 2
                     String msjRecorrido = String.valueOf(recorrido);
                     datoSalida.writeUTF("es tu turno\n" + msjRecorrido);
@@ -294,9 +279,15 @@ public class Interfaz extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         }
+        JLabel Food = null;
+        JLabel Food_2 = null;
+        JLabel Food_3 = null;
+        JLabel H_azul = null;
+        JLabel H_verde = null;
+        JLabel N_azul = null;
+        JLabel N_verde = null;
         
         JLabel[] posiciones = new JLabel[]{H_azul, H_verde, Food, Food_2, Food_3, N_azul, N_verde};
-        int PassNombre=0;
         
         while (close == 1) {
             try {
@@ -304,17 +295,11 @@ public class Interfaz extends javax.swing.JFrame {
             } catch (java.net.SocketException ex) {
             } catch (IOException ex) {
                 Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
-
-               
-            }if (PassNombre==0){
-                PassNombre=1;
-                Interfaz2=mensaje;
-                LabelNombres.setAlignmentY(CENTER_ALIGNMENT);
-                LabelNombres.setAlignmentX(LEFT_ALIGNMENT);
-                LabelNombres.setText("<html>Tú:<p>"+Interfaz+"<p>Rival:<p>"+Interfaz2+"<p></html>");
+   
             }
+            
             //se asignan el tipo de casilla aleatorio con su imagen respectiva recibidas del jugador 2
-            else if (mensaje.equals("casilla")) {
+            if (mensaje.equals("posicion")) {
 
                 for (int i = 0; i <= posiciones.length; i++) {
                     if (i != posiciones.length) {
@@ -325,27 +310,27 @@ public class Interfaz extends javax.swing.JFrame {
                         } catch (IOException e) {
 
                         }
-    }
+    
      
     
-           int index = Integer.parseInt(mensaje);
-                   JLabel posiciones = posiciones[i];
+                   int index = Integer.parseInt(mensaje);
+                   JLabel posicion = posiciones[i];
 
                    switch (index) {
                         case 1:
-                            coordenadas.insertLast(posiciones.getX(), posiciones.getY(), index);
-                            posiciones.setIcon(imagenes.CasillaReto);
+                            coordenadas.insertLast(posicion.getX(), posicion.getY(), index);
+                            posicion.setIcon(imagenes.Food);
                             break;
                         case 2:
-                            coordenadas.insertLast(posiciones.getX(), posiciones.getY(), index);
-                            posiciones.setIcon(imagenes.CasillaTrampa);
+                            coordenadas.insertLast(posicion.getX(), posicion.getY(), index);
+                            posicion.setIcon(imagenes.N_verde);
                             break;
                         case 3:
-                            coordenadas.insertLast(posiciones.getX(), posiciones.getY(), index);
-                            posiciones.setIcon(imagenes.CasillaTunel);
+                            coordenadas.insertLast(posicion.getX(), posicion.getY(), index);
+                            posicion.setIcon(imagenes.N_azul);
                             break;
                     }
-                } else {
+                }   else {
                     coordenadas.insertFinal(N_verde.getX(), N_verde.getY());
                 }
                 
@@ -354,73 +339,41 @@ public class Interfaz extends javax.swing.JFrame {
                // condición que se cumple cuando ya se sabe quien es el jugador que comienza a jugar
                 if (mensaje.equals("iniciar")) {
 
-                    MainPanel.setVisible(false);
-                    PanelJuego.setVisible(true);
-                    mensaje = "";
-
-                } else if (mensaje.equals("otra vez")) {
-                    buttonDado.setEnabled(true);
-                    botonEnabled = true;
-                    Dado.setIcon(imagenes.CasillaZero);
-                    recorrido = 0;
-                    valorDado = 0;
-
-                    // se cumple cuando el jugador 2 ya ha tirado su turno del dado
-                } else if (mensaje.equals("es tu turno")) {
-                    buttonDado.setEnabled(true);
-                    botonEnabled = true;
-                    valorDado = 1;
-} else {
+                    mensaje = ""; 
+                    
+                }else {
                     //se obtiene dos mensajes enviados por el jugador 2 y se guardan en un arreglo
                     String[] msjAvance = mensaje.split("\n");
                     if (mensaje.equals("")) {
                         H_azul.setLocation(H_azul.getX() + 20, H_azul.getY());
-
-                        //se cumple cuando el jugador 2 ha contestado bien a su pregunta de reto
-                    } else if (mensaje.equals("correcto")) {
-                        H_azul.setLocation(H_azul.getX(), H_azul.getY());
-                        buttonDado.setEnabled(true);
-                        LabelPregunta.setText("Respuesta correcta");
-                        botonEnabled = true;
-
-                        //se muestra la pregunta que se le asignó al jugador 2
-                    } else if (msjAvance[1].equals("pregunta")) {
-                        LabelPregunta.setVisible(true);
-                        LabelPregunta.setVerticalAlignment(CENTER);
-                        LabelPregunta.setText("<html>¡Reto para Oponente!<p><p>" + msjAvance[0] + "<p></html>");
 
                     } else {
 
                         int AvanceFicha2 = Integer.parseInt(msjAvance[1]);
 
                         if (AvanceFicha2 <= 0) {
-                            H_azul.setLocation(CInicio.getX() + 20, CInicio.getY());
-                            buttonDado.setEnabled(true);
-                            botonEnabled = true;
+                            H_azul.setLocation(N_azul.getX() + 20, N_azul.getY());
+                            //ButtonB_start.setEnabled(true);
+                            //botonEnabled = true;
                             
                         } else if (msjAvance[0].equals("esperando")) {
-                            int[] coordenadasCasilla;
-                            coordenadasCasilla = coordenadas.ObtenerCoordenadas(AvanceFicha2);
-                            H_azul.setLocation(coordenadasCasilla[0] + 20, coordenadasCasilla[1]);
+                            int[] coordenadasposiciones;
+                            coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha2);
+                            H_azul.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
 
                             //se cumple cuando el jugador 2 ha ganado
                         } else if (msjAvance[0].equals("fin del juego")) {
-                            int[] coordenadasCasilla;
-                            coordenadasCasilla = coordenadas.ObtenerCoordenadas(AvanceFicha2);
-                            fichaJugador2.setLocation(coordenadasCasilla[0] + 20, coordenadasCasilla[1]);
-                            LabelPregunta.setVisible(true);
-                            LabelPregunta.setVerticalAlignment(TOP);
-                            LabelPregunta.setText("<html>¡Fin del Juego!<p><p>!Has perdido!<p></html>");
-                            buttonDado.setEnabled(false);
-                            botonEnabled = false;
-                            salirFin.setVisible(true);
-                            salirFin.setLocation(botonRespuesta.getX(), botonRespuesta.getY());
+                            int[] coordenadasposiciones;
+                            coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha2);
+                            H_azul.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                            //buttonDado.setEnabled(false);
+                            //botonEnabled = false;
                             try {
                                 socket.close();
                             } catch (IOException ex) {
                             }
                             try {
-datoSalida.close();
+                                datoSalida.close();
                             } catch (IOException ex) {
                             }
                             try {
@@ -437,12 +390,11 @@ datoSalida.close();
                             /* se actualiza el progreso del jugador 2 o si el otro jugador responde de forma incorrecta 
                             la pregunta de reto*/
                         } else {
-                            LabelPregunta.setText("Respuesta incorrecta");
                             int[] coordenadasCasilla;
                             coordenadasCasilla = coordenadas.ObtenerCoordenadas(AvanceFicha2);
                             H_azul.setLocation(coordenadasCasilla[0] + 20, coordenadasCasilla[1]);
-                            buttonDado.setEnabled(true);
-                            botonEnabled = true;
+                            //buttonDado.setEnabled(true);
+                            //botonEnabled = true;
 }
 
                     }
