@@ -346,7 +346,7 @@ public class Interfaz extends javax.swing.JFrame {
                             break;
                     }
                 } else {
-                    coordenadas.insertFinal(CFinal.getX(), CFinal.getY());
+                    coordenadas.insertFinal(N_verde.getX(), N_verde.getY());
                 }
                 
           }
