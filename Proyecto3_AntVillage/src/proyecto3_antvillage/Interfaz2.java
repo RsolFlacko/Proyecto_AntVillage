@@ -159,7 +159,7 @@ public class Interfaz2 extends javax.swing.JFrame {
 
     private void B_startMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_B_startMouseClicked
         // TODO add your handling code here:
-        if {
+        //if {
             // Arreglo de tipo JLabel que contiene cada una de las casilla del tablero
             JLabel[] posiciones = new JLabel[]{H_azul, H_verde, Food, Food_2, Food_3, N_azul, N_verde};
             Asignar_posiciones listaposicionesRandom = new Asignar_posiciones();
@@ -206,7 +206,7 @@ public class Interfaz2 extends javax.swing.JFrame {
                 }
                 H_verde.setLocation(N_verde.getX() + 20, N_verde.getY());
                 H_azul.setLocation(N_azul.getX(), N_azul.getY());
-            }
+            
     }//GEN-LAST:event_B_startMouseClicked
 
     public void finalizarJuego() {
@@ -238,7 +238,7 @@ public class Interfaz2 extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -273,7 +273,6 @@ public class Interfaz2 extends javax.swing.JFrame {
             socket = new Socket("127.0.0.1", 1201);
             datoEntrada = new DataInputStream(socket.getInputStream());
             datoSalida = new DataOutputStream(socket.getOutputStream());
-            int PassNombre = 0; //variable para tomar el nombre del jugador 1 solo una vez
 
             //bucle donde que se encuentra escuchando los mensajes del jugador 1
             while (true) {
@@ -283,93 +282,53 @@ public class Interfaz2 extends javax.swing.JFrame {
                 } catch (IOException ex) {
                     Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                 // se recibe el nombre del jugador 1
-                if (PassNombre == 0) {
-                    PassNombre = 1;
-                    Interfaz = mensaje;
 
-                }
-                
-                //se cumple cuando ambos jugadores obtenga el mismo número de dado
-                else if (valorDado == 0 && !mensaje.equals("") && count == 0) {
-                    buttonDado2.setEnabled(true);
-                    botonEnabled = true;
+                int AvanceFicha1 = Integer.parseInt(msjAvance[1]);
 
-                } else {
-                     //se obtiene dos mensajes enviados por el jugador 1 y se guardan en un arreglo
-                    String[] msjAvance = mensaje.split("\n");
-                    if (mensaje.equals("")) {
-                        H_verde.setLocation(H_verde.getX() + 20, H_verde.getY());
+                if (AvanceFicha1 <= 0) {
+                    H_verde.setLocation(N_verde.getX() + 20, N_verde.getY());
+                    //buttonDado2.setEnabled(true);
+                    //botonEnabled = true;
 
-                        //se cumple cuando el jugador 1 ha contestado bien a su pregunta de reto
-                    } else if (mensaje.equals("correcto")) {
-                        H_verde.setLocation(H_verde.getX(), H_verde.getY());
-                        buttonDado2.setEnabled(true);
-                        LabelPregunta.setText("Respuesta correcta");
-                        botonEnabled = true;
-
-                        //se muestra la pregunta que se le asignó al jugador 1
-                    } else if (msjAvance[1].equals("pregunta")) {
-                        LabelPregunta.setVisible(true);
-                        LabelPregunta.setVerticalAlignment(CENTER);
-                        LabelPregunta.setText("<html>¡Reto para Oponente!<p><p>" + msjAvance[0] + "<p></html>");
-} else {
-
-                        int AvanceFicha1 = Integer.parseInt(msjAvance[1]);
-
-                        if (AvanceFicha1 <= 0) {
-                            H_verde.setLocation(N_verde.getX() + 20, N_verde.getY());
-                            buttonDado2.setEnabled(true);
-                            botonEnabled = true;
-
-                            // se actualiza el progreso del jugador 1 antes del reto que se le asignó
-                        } else if (msjAvance[0].equals("esperando")) {
-                            int[] coordenadasposiciones;
-                            coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha1);
-                            H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                    // se actualiza el progreso del jugador 1 antes del reto que se le asignó
+                } else if (msjAvance[0].equals("esperando")) {
+                    int[] coordenadasposiciones;
+                    coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha1);
+                    H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
 //se cumple cuando el jugador 1 ha ganado
-                        } else if (msjAvance[0].equals("fin del juego")) {
-                            int[] coordenadasposiciones;
-                            coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha1);
-                            H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
-                            LabelPregunta.setVisible(true);
-                            LabelPregunta.setVerticalAlignment(TOP);
-                            LabelPregunta.setText("<html>¡Fin del Juego!<p><p>!Has perdido!<p></html>");
-                            buttonDado2.setEnabled(false);
-                            botonEnabled = false;
-                            salirFin.setVisible(true);
-                            salirFin.setLocation(botonRespuesta.getX(), botonRespuesta.getY());
-                            try {
-                                socket.close();
-                            } catch (IOException ex) {
-                            }
-                            try {
-                                datoSalida.close();
-                            } catch (IOException ex) {
-                            }
-                            try {
-                                datoEntrada.close();
-                            } catch (IOException ex) {
-                            }
-
-                            return;
-                            
-                            /* se actualiza el progreso del jugador 1 o si el otro jugador responde de forma incorrecta 
-                            la pregunta de reto*/
-                        } else {
-                            LabelPregunta.setText("Respuesta incorrecta");
-                            int[] coordenadasposiciones;
-                            coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha1);
-                            H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
-                            buttonDado2.setEnabled(true);
-                            botonEnabled = true;
-                        }
-
+                } else if (msjAvance[0].equals("fin del juego")) {
+                    int[] coordenadasposiciones;
+                    coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha1);
+                    H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                    //buttonDado2.setEnabled(false);
+                    //botonEnabled = false;
+                    try {
+                        socket.close();
+                    } catch (IOException ex) {
+                    }
+                    try {
+                        datoSalida.close();
+                    } catch (IOException ex) {
+                    }
+                    try {
+                        datoEntrada.close();
+                    } catch (IOException ex) {
                     }
 
+                    return;
+
+                    /* se actualiza el progreso del jugador 1 o si el otro jugador responde de forma incorrecta 
+                    la pregunta de reto*/
+                } else {
+                    int[] coordenadasposiciones;
+                    coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceFicha1);
+                    H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                    //buttonDado2.setEnabled(true);
+                    //botonEnabled = true;
                 }
-            }
-        } catch (IOException ex) {
+
+                }         
+    } catch (IOException ex) {
             Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
