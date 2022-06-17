@@ -23,12 +23,12 @@ public class Nodo {
     public void setcoordenadas(int ejeX,int ejeY) {
         this.X = ejeX;
         this.Y = ejeY;
-    
+    }
     /**
      *
      * @param tipo
      */
-    public void setTipoposiciones(int tipo){
+    public void setTipoposiciones(int tipo) {
         this.tipoposiciones=tipo;
     }
     
