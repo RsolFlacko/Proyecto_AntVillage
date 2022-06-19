@@ -1,6 +1,7 @@
 
 package proyecto3_antvillage;
 
+//Se importa la biblioteca
 import javax.swing.ImageIcon;
 
 /**

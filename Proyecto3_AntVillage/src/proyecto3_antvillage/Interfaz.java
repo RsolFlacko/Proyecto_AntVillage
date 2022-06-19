@@ -1,6 +1,7 @@
 
 package proyecto3_antvillage;
 
+//Se importan las bibliotecas
 import java.awt.Color;
 import java.awt.Image;
 import java.io.DataInputStream;

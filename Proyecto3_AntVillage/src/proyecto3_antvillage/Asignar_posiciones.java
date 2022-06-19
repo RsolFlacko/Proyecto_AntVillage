@@ -1,19 +1,21 @@
 
 package proyecto3_antvillage;
 
+//Se importan las bibliotecas
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 /**
- *
- * @author pc
+ * Representa la clase donde se asignan las posiciones
+ * @author Roger Solano
  */
 public class Asignar_posiciones {
     private int [] posiciones;
         ArrayList <Integer> Tipoposiciones = new ArrayList <Integer>();
     
+    //Asigna posiciones
     public Asignar_posiciones(){
         posiciones = new int[5];
         for (int i=1;i<=3;i++){
@@ -26,6 +28,7 @@ public class Asignar_posiciones {
 
     }
     
+    //Recorre el largo de las posiciones
     public int[] dequeue() {
 
         int count = 0;
@@ -40,6 +43,7 @@ public class Asignar_posiciones {
         return this.posiciones;
         }
 
+    //Llama a la funcion
     public static void main(String args[]){
 
         Asignar_posiciones p = new Asignar_posiciones();
