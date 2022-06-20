@@ -152,7 +152,7 @@ public class Interfaz2 extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 476, Short.MAX_VALUE))
+                .addGap(0, 37, Short.MAX_VALUE))
         );
 
         pack();
@@ -298,7 +298,7 @@ public class Interfaz2 extends javax.swing.JFrame {
                 int AvanceH_verde = Integer.parseInt(msjAvance[1]);
                 
                 if (AvanceH_verde <= 0) {
-                    H_verde.setLocation(N_verde.getX() + 20 , N_verde.getY());
+                    //H_verde.setLocation(N_verde.getX() + 20 , N_verde.getY());
                     //botonEnabled = true;
 
                     // se actualiza el progreso de la hormiga
@@ -310,7 +310,7 @@ public class Interfaz2 extends javax.swing.JFrame {
                 } else if (msjAvance[0].equals("fin del juego")) {
                     int[] coordenadasposiciones;
                     coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceH_verde);
-                    H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                    //H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
                     //botonEnabled = false;
                     try {
                         socket.close();
@@ -332,7 +332,7 @@ public class Interfaz2 extends javax.swing.JFrame {
                 } else {
                     int[] coordenadasposiciones;
                     coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceH_verde);
-                    H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                    //H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
                     //buttonDado2.setEnabled(true);
                     //botonEnabled = true;
                 }
