@@ -2,21 +2,23 @@
 package proyecto3_antvillage;
 
 /**
- *
- * @author pc
+ * Representa la lista de posiciones
+ * @author Roger Solano
  */
 public class List_posiciones {
-    private Nodo head;
-    private Nodo temp;
+    private Nodo head; //La cabeza
+    private Nodo temp; //el nodo que continua
     
     public List_posiciones() {
-        this.head = null;
+        this.head = null; //Apunta a nulo
     }
     
+    //Función por si la lista está vacía
     public boolean isEmpty() {
         return this.head == null;
     }
     
+    //Función que inserta el ultimo nodo
     public void insertLast(int ejeX, int ejeY,int tipo) {
         Nodo newNode = new Nodo();
         if (isEmpty()) {
@@ -42,6 +44,7 @@ public class List_posiciones {
 
     }
     
+    //Inserta el nodo en la cola al final
     public void insertFinal(int ejeX, int ejeY){
         Nodo newNode = new Nodo();
         newNode.setcoordenadas(ejeX, ejeY);
@@ -49,6 +52,7 @@ public class List_posiciones {
         temp.setNext(newNode);
     }
     
+    //Obtiene las coordenadas
     public int[] ObtenerCoordenadas(int numposiciones) {
         Nodo posicionesTemp = this.head;
         for(int i=1;i <= numposiciones;i++) {

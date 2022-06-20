@@ -1,11 +1,37 @@
 
 package proyecto3_antvillage;
 
+//Se importan las bibliotecas
+import java.awt.Color;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import static javax.swing.SwingConstants.CENTER;
+import static javax.swing.SwingConstants.TOP;
+
 /**
- *
- * @author pc
+ *Representa el cliente
+ * @author Roger Solano
  */
 public class Interfaz2 extends javax.swing.JFrame {
+    
+    static boolean botonEnabled = false; // estado del botón de start.
+    static List_posiciones coordenadas = new List_posiciones();
+    int recorrido = 0; // progreso de la hormiga en la simulacion
+    Imagenes imagenes = new Imagenes(); //Referencia a las imagenes
+    static String mensaje = ""; //Mensajes que se envian y se reciben
+
+    static Socket socket; // Creacion de socket
+    static DataInputStream datoEntrada;
+    static DataOutputStream datoSalida;
 
     /**
      * Creates new form Interfaz2
@@ -132,15 +158,98 @@ public class Interfaz2 extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /*
+    * Función del botón start
+    */
     private void B_startMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_B_startMouseClicked
         // TODO add your handling code here:
+            // Arreglo de tipo JLabel que contiene cada una de los nodos del grafo
+            JLabel[] posiciones = new JLabel[]{H_azul, H_verde, Food, Food_2, Food_3, N_azul, N_verde};
+            Asignar_posiciones listaposicionesRandom = new Asignar_posiciones();
+            int[] posicionesRandom; // Se generan las posiciones de una manera aleatoria
+            posicionesRandom = listaposicionesRandom.dequeue();
+            
+            // Envia información de las posiciones
+            try {
+                datoSalida.writeUTF("posicion");
+            } catch (IOException ex) {
+                Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+            }
         
+            //Recorrer las posiciones
+            for (int i = 0; i <= posiciones.length; i++) {
+                if (i != posiciones.length) {
+                    JLabel posicion = posiciones[i];
+                    String index = String.valueOf(posicionesRandom[i]);
+                    
+                    // Avisa sobre el recorrido
+                    try {
+                        datoSalida.writeUTF(index);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    // Se elige dependiendo del caso el tipo de posiciones
+                    switch (posicionesRandom[i]) {
+                        case 1:
+                            coordenadas.insertLast(posicion.getX(), posicion.getY(), posicionesRandom[i]);
+                            posicion.setIcon(imagenes.Food);
+                            break;
+                        case 2:
+                            coordenadas.insertLast(posicion.getX(), posicion.getY(), posicionesRandom[i]);
+                            posicion.setIcon(imagenes.N_verde);
+                            break;
+                        case 3:
+                            coordenadas.insertLast(posicion.getX(), posicion.getY(), posicionesRandom[i]);
+                            posicion.setIcon(imagenes.N_azul);
+                            break;
+                    }
+                 
+                } else {
+                        coordenadas.insertFinal(N_azul.getX(), N_azul.getY());
+                    }
+                }
+                // Le avisa a la interfaz el comienzo de la simulación
+                try {
+                    datoSalida.writeUTF("iniciar");
+                } catch (IOException ex) {
+                    Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                H_verde.setLocation(N_verde.getX() + 20, N_verde.getY());
+                H_azul.setLocation(N_azul.getX(), N_azul.getY());
+            
     }//GEN-LAST:event_B_startMouseClicked
-
+    
+    // Finaliza la simulación
+    public void finalizarJuego() {
+        String msjRecorrido = String.valueOf(recorrido);
+        try {
+            datoSalida.writeUTF("fin del juego\n" + msjRecorrido);
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            datoSalida.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            datoEntrada.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return;
+    }
+    
     /**
-     * @param args the command line arguments
+     * @param args 
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -170,6 +279,68 @@ public class Interfaz2 extends javax.swing.JFrame {
                 new Interfaz2().setVisible(true);
             }
         });
+        // Socket para el cliente
+        try {
+            socket = new Socket("127.0.0.1", 1201);
+            datoEntrada = new DataInputStream(socket.getInputStream());
+            datoSalida = new DataOutputStream(socket.getOutputStream());
+
+            //Esta atento a escuchar los mensajes que vienen de interfaz
+            while (true) {
+                try {
+                    mensaje = datoEntrada.readUTF();
+                } catch (java.net.SocketException ex) {
+                } catch (IOException ex) {
+                    Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                String[] msjAvance = mensaje.split("\n");
+                int AvanceH_verde = Integer.parseInt(msjAvance[1]);
+                
+                if (AvanceH_verde <= 0) {
+                    H_verde.setLocation(N_verde.getX() + 20 , N_verde.getY());
+                    //botonEnabled = true;
+
+                    // se actualiza el progreso de la hormiga
+                } else if (msjAvance[0].equals("esperando")) {
+                    int[] coordenadasposiciones;
+                    coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceH_verde);
+                    //H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                //se cumple cuando la hormiga haya llegado
+                } else if (msjAvance[0].equals("fin del juego")) {
+                    int[] coordenadasposiciones;
+                    coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceH_verde);
+                    H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                    //botonEnabled = false;
+                    try {
+                        socket.close();
+                    } catch (IOException ex) {
+                    }
+                    try {
+                        datoSalida.close();
+                    } catch (IOException ex) {
+                    }
+                    try {
+                        datoEntrada.close();
+                    } catch (IOException ex) {
+                    }
+
+                    return;
+
+                    /* se actualiza el progreso del jugador 1 o si el otro jugador responde de forma incorrecta 
+                    la pregunta de reto*/
+                } else {
+                    int[] coordenadasposiciones;
+                    coordenadasposiciones = coordenadas.ObtenerCoordenadas(AvanceH_verde);
+                    H_verde.setLocation(coordenadasposiciones[0] + 20, coordenadasposiciones[1]);
+                    //buttonDado2.setEnabled(true);
+                    //botonEnabled = true;
+                }
+
+                }         
+    } catch (IOException ex) {
+            Logger.getLogger(Interfaz2.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
